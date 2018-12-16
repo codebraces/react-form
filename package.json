@@ -29,26 +29,23 @@
   },
   "homepage": "https://github.com/codebraces/reform#readme",
   "peerDependencies": {
-    "react": ">= 15.5.8",
-    "react-dom": ">= 15.5.8"
+    "react": ">= 16.4.0",
+    "react-dom": ">= 16.4.0"
   },
   "devDependencies": {
     "@braces/tslint-config": "^0.3.1",
     "@types/chai": "^4.1.4",
     "@types/mocha": "^5.2.5",
-    "@types/react": "^15.6.19",
-    "@types/react-dom": "^15.5.8",
+    "@types/react": "~16.4.0",
     "chai": "^4.1.2",
     "mocha": "^5.2.0",
-    "react": "^15.6.2",
-    "react-dom": "^15.6.2",
+    "react": "~16.4.0",
+    "react-dom": "~16.4.0",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "typescript": "^3.0.1"
   },
   "dependencies": {
-    "@dock365/validator": "^0.8.1",
-    "create-react-context": "^0.2.3",
-    "prop-types": "^15.6.2"
+    "@braces/validator": "^0.6.0"
   }
 }

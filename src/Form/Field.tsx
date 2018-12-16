@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FormContext, validationRules } from './Form';
-import { validationTypes } from '@dock365/validator';
+import { validationTypes } from '@braces/validator';
 
 export interface IFieldRenderProps {
   name: string;

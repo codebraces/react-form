@@ -7,8 +7,7 @@ import Validator, {
   IEmailValidationOptions,
   validationTypes,
   IValidationResponse,
-} from "@dock365/validator";
-import createReactContext, { Context, ProviderProps } from 'create-react-context';
+} from "@braces/validator";
 
 export enum ValidateOnTypes {
   Submit,
@@ -66,7 +65,7 @@ export interface IFormContext {
   showAsteriskOnRequired?: boolean;
 }
 
-export const FormContext: Context<IFormContext> = createReactContext({});
+export const FormContext: React.Context<IFormContext> = React.createContext({});
 
 export class Form extends React.Component<IFormProps, IFormState> {
   private validator: Validator;
