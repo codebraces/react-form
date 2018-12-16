@@ -2,6 +2,9 @@
 <!-- [![Build Status](https://travis-ci.org/codebraces/reform.svg?branch=master)](https://travis-ci.org/codebraces/reform) -->
 [![npm Version](https://img.shields.io/npm/v/@braces/reform.svg)](https://www.npmjs.com/package/@braces/reform)
 
+## Requirement
+React version 16.4.0 is required. To work on older version of react use @braces/reform version 4.0.0 or older.
+
 
 ## Install
 1 Install react form as dependency
