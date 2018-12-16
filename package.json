@@ -11,6 +11,7 @@
     "patch-release": "npm version patch && npm publish --access=public && git push --follow-tags",
     "minor-release": "npm version minor && npm publish --access=public && git push --follow-tags",
     "major-release": "npm version major && npm publish --access=public && git push --follow-tags",
+    "start": "parcel example/index.html",
     "test": "mocha -r ts-node/register --watch-extensions ts,tsx --watch 'test/**/*.spec.ts' 'src/**/*.ts'"
   },
   "repository": {
@@ -37,8 +38,10 @@
     "@types/chai": "^4.1.4",
     "@types/mocha": "^5.2.5",
     "@types/react": "~16.4.0",
+    "@types/react-dom": "^16.0.11",
     "chai": "^4.1.2",
     "mocha": "^5.2.0",
+    "parcel-bundler": "^1.10.3",
     "react": "~16.4.0",
     "react-dom": "~16.4.0",
     "ts-node": "^7.0.1",
