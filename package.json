@@ -47,9 +47,7 @@
     "typescript": "^3.0.1"
   },
   "dependencies": {
-    "@braces/validator": "^0.3.3",
-    "@types/react": "^15.5.8",
-    "@types/react-dom": "^15.5.8",
+    "@dock365/validator": "^0.8.1",
     "create-react-context": "^0.2.3",
     "prop-types": "^15.6.2"
   }

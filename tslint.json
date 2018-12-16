@@ -1,6 +1,6 @@
 {
     "defaultSeverity": "error",
-    "extends": ["@braces/tslint-config@"],
+    "extends": ["@braces/tslint-config"],
     "jsRules": {
     },
     "rulesDirectory": []
