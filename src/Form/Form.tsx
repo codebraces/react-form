@@ -1,5 +1,13 @@
 import React, { FormEvent } from "react";
-import Validator, { IValidationFailMessages, IStringValidationOptions, INumberValidationOptions, IDateValidationOptions, IEmailValidationOptions, validationTypes, IValidationResponse } from "@braces/validator";
+import Validator, {
+  IValidationFailMessages,
+  IStringValidationOptions,
+  INumberValidationOptions,
+  IDateValidationOptions,
+  IEmailValidationOptions,
+  validationTypes,
+  IValidationResponse,
+} from "@dock365/validator";
 import createReactContext, { Context, ProviderProps } from 'create-react-context';
 
 export enum ValidateOnTypes {
@@ -9,40 +17,56 @@ export enum ValidateOnTypes {
 }
 
 export interface IFormProps {
-  // fields: IField[];
   submitElement?: JSX.Element;
   onSubmit?: (e: FormEvent<HTMLFormElement>, values: ISubmitValues) => void;
   onBlur?: (e: FormEvent<HTMLFormElement>, values: ISubmitValues) => void;
   onChange?: (e: FormEvent<HTMLFormElement>, values: ISubmitValues) => void;
   validationMessages?: IValidationFailMessages;
   validateOn?: ValidateOnTypes;
+  showAsteriskOnRequired?: boolean;
 }
 
 export interface ISubmitValues {
   [name: string]: string | number | boolean;
 }
 
-export type validationRules = (IStringValidationOptions & { type: validationTypes.String }) | (INumberValidationOptions & { type: validationTypes.Number }) | (IDateValidationOptions & { type: validationTypes.Date }) | (IEmailValidationOptions & { type: validationTypes.Email })
+export type validationRules =
+  (IStringValidationOptions & { type: validationTypes.String }) |
+  (INumberValidationOptions & { type: validationTypes.Number }) |
+  (IDateValidationOptions & { type: validationTypes.Date }) |
+  (IEmailValidationOptions & { type: validationTypes.Email });
+
 export interface IField {
   name: string;
+  label?: string;
   value?: any;
   errors?: string[];
   validationRules?: validationRules;
+  updated?: boolean;
 }
 
 export interface IFormState {
-  fields: IField[],
+  fields: IField[];
   hasError: boolean;
 }
 
 export interface IFormContext {
-  onChange?: (value: string | number | boolean | React.MouseEvent<HTMLInputElement>, name: string, e?: React.MouseEvent<HTMLInputElement>) => void;
-  onBlur?: (value: string | number | boolean | React.MouseEvent<HTMLInputElement>, name: string, e?: React.MouseEvent<HTMLInputElement>) => void;
+  onChange?: (
+    value: string | number | boolean | Date,
+    name: string,
+    e?: React.MouseEvent<HTMLInputElement>,
+  ) => void;
+  onBlur?: (
+    value: string | number | boolean | Date,
+    name: string,
+    e?: React.MouseEvent<HTMLInputElement>,
+  ) => void;
   fields?: IField[];
-  initialize?: (name: string, validationRules?: validationRules) => void;
+  initialize?: (name: string, label?: string, validationRules?: validationRules, value?: any, update?: boolean) => void;
+  showAsteriskOnRequired?: boolean;
 }
 
-export const FormContext: Context<IFormContext> = createReactContext({})
+export const FormContext: Context<IFormContext> = createReactContext({});
 
 export class Form extends React.Component<IFormProps, IFormState> {
   private validator: Validator;
@@ -56,7 +80,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
     };
 
     this.validator = new Validator({
-      failMessages: this.props.validationMessages
+      failMessages: this.props.validationMessages,
     });
 
     this._initializeField = this._initializeField.bind(this);
@@ -68,10 +92,6 @@ export class Form extends React.Component<IFormProps, IFormState> {
     this._onFormBlur = this._onFormBlur.bind(this);
   }
 
-  public componentDidMount() {
-
-  }
-
   public render() {
     return (
       <FormContext.Provider value={{
@@ -79,12 +99,13 @@ export class Form extends React.Component<IFormProps, IFormState> {
         onBlur: this._onFieldBlur,
         fields: this.state.fields,
         initialize: this._initializeField,
+        showAsteriskOnRequired: this.props.showAsteriskOnRequired,
       }}>
         <form
           onSubmit={this._onSubmit}
           onChange={this._onFormChange}
           onBlur={this._onFormBlur}
-          ref={ref => { this.form = ref }}
+          ref={ref => { this.form = ref; }}
         >
           {this.props.children}
         </form >
@@ -92,42 +113,55 @@ export class Form extends React.Component<IFormProps, IFormState> {
     );
   }
 
-  private _initializeField(name: string, validationRules?: validationRules) {
+  private _initializeField(name: string, label?: string, _validationRules?: validationRules, value?: any) {
     const fieldValue = this.state.fields.find(item => item.name === name);
     if (name && !fieldValue) {
-      this.setState(prevState => ({
-        fields: [
-          ...prevState.fields,
+      this.setState(
+        prevState => (
           {
-            name,
-            validationRules,
-            value: "",
-            errors: [],
+            fields: [
+              ...prevState.fields,
+              {
+                name,
+                label,
+                validationRules: _validationRules,
+                errors: [],
+                updated: false,
+              },
+            ],
           }
-        ]
-      }))
+        ),
+      );
     }
   }
 
-  private _onFieldChange(value: string | number | boolean | React.MouseEvent<HTMLInputElement>, name: string, e?: React.MouseEvent<HTMLInputElement>) {
+  private _onFieldChange(
+    value: string | number | boolean | Date,
+    name: string,
+    e?: React.MouseEvent<HTMLInputElement>,
+  ) {
     const fieldValue = this.state.fields.find(item => item.name === name);
     if (fieldValue) {
-      fieldValue.value = typeof value === "object" ? value.currentTarget.value : value;
+      fieldValue.value = value;
       this.setState(prevState => {
         return {
-          fields: prevState.fields.map(item => item.name === fieldValue.name ? { ...fieldValue } : item)
-        }
-      })
+          fields: prevState.fields.map(item => item.name === fieldValue.name ? { ...fieldValue } : item),
+        };
+      });
       if (this.props.validateOn === ValidateOnTypes.FieldChange) {
         this._validateField(fieldValue);
       }
     }
   }
 
-  private _onFieldBlur(value: string | number | boolean | React.MouseEvent<HTMLInputElement>, name: string, e?: React.MouseEvent<HTMLInputElement>) {
+  private _onFieldBlur(
+    value: string | number | boolean | Date,
+    name: string,
+    e?: React.MouseEvent<HTMLInputElement>,
+  ) {
     const fieldValue = this.state.fields.find(item => item.name === name);
     if (fieldValue) {
-      fieldValue.value = typeof value === "object" ? value.currentTarget.value : value;
+      fieldValue.value = value;
       if (this.props.validateOn === ValidateOnTypes.FieldBlur) {
         this._validateField(fieldValue);
       }
@@ -150,24 +184,30 @@ export class Form extends React.Component<IFormProps, IFormState> {
     e.preventDefault();
     if (this.props.validateOn === ValidateOnTypes.Submit) {
       this._validateAll(() => {
-        this.props.onSubmit && this.props.onSubmit(e, this._structuredValues())
-      })
+        if (this.props.onSubmit)
+          this.props.onSubmit(e, this._structuredValues());
+      });
     } else {
-      !this.state.hasError &&
-        this.props.onSubmit &&
-        this.props.onSubmit(e, this._structuredValues())
+      if (!this.state.hasError && this.props.onSubmit)
+        this.props.onSubmit(e, this._structuredValues());
     }
   }
 
   private _structuredValues(): ISubmitValues {
     const values: ISubmitValues = {};
-    this.state.fields.forEach(field => values[field.name] = field.value)
+    this.state.fields.forEach(field => values[field.name] = field.value);
+
     return values;
   }
 
-  private _validateAll(cb: Function) {
-    if (this.state.fields.every(field => this._validateField(field)))
-      cb()
+  private _validateAll(cb: () => void) {
+    const success = this.state.fields.reduce((prevValue, field) => this._validateField(field) && prevValue, true);
+    // let success = true;
+    // this.state.fields.forEach((field) => {
+    //   success = success && this._validateField(field);
+    // });
+    if (success)
+      cb();
   }
 
   private _validateField(field: IField) {
@@ -175,43 +215,49 @@ export class Form extends React.Component<IFormProps, IFormState> {
       let result: IValidationResponse;
       switch (field.validationRules.type) {
         case validationTypes.String:
-          result = this.validator[validationTypes.String](field.name, field.value, field.validationRules);
+          result =
+            this.validator[validationTypes.String](field.label || field.name, field.value || "", field.validationRules);
           break;
         case validationTypes.Number:
-          result = this.validator[validationTypes.Number](field.name, field.value, field.validationRules);
+          result =
+            this.validator[validationTypes.Number](field.label || field.name, field.value || 0, field.validationRules);
           break;
         case validationTypes.Date:
-          result = this.validator[validationTypes.Date](field.name, field.value, field.validationRules);
+          result =
+            this.validator[validationTypes.Date](field.label || field.name, field.value, field.validationRules);
           break;
         case validationTypes.Email:
-          result = this.validator[validationTypes.Email](field.name, field.value, field.validationRules);
+          result =
+            this.validator[validationTypes.Email](field.label || field.name, field.value || "", field.validationRules);
           break;
 
         default:
           result = {
             success: true,
             messages: [],
-          }
+          };
           break;
       }
       if (!result.success) {
         this.setState(prevState => {
           return {
             fields: [
-              ...prevState.fields.map(item => item.name === field.name ? { ...item, errors: result.messages } : item)
+              ...prevState.fields.map(item => item.name === field.name ? { ...item, errors: result.messages } : item),
             ],
-          }
+          };
         });
+
         return false;
       }
       this.setState(prevState => {
         return {
           fields: [
-            ...prevState.fields.map(item => item.name === field.name ? { ...item, errors: [] } : item)
+            ...prevState.fields.map(item => item.name === field.name ? { ...item, errors: [] } : item),
           ],
-        }
+        };
       });
     }
+
     return true;
   }
 }
