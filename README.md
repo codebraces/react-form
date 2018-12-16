@@ -2,6 +2,7 @@
 <!-- [![Build Status](https://travis-ci.org/codebraces/react-form.svg?branch=master)](https://travis-ci.org/codebraces/react-form) -->
 [![npm Version](https://img.shields.io/npm/v/@braces/react-form.svg)](https://www.npmjs.com/package/@braces/react-form)
 
+#### This package is deprecate, Please check [@braces/reform](https://www.npmjs.com/package/@braces/reform)
 
 ## Install
 1 Install react form as dependency
